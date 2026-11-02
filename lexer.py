@@ -155,6 +155,8 @@ def probar_lexer(archivo_prueba, autor):
     with open(archivo_prueba, 'r', encoding='utf-8') as file:
         data = file.read()
     
+    lexer.lineno = 1        # reiniciar entre pruebas
+    lexer.errores = []
     lexer.input(data)
     
     logs = []
@@ -179,14 +181,21 @@ def probar_lexer(archivo_prueba, autor):
     
     with open(ruta_log, 'w', encoding='utf-8') as file2:
         
-        file2.write("\n ERRORES LÉXICOS: ")
-        for e in lexer.errores:
-            file2.write(e+"\n")
+        file2.write("TOKENS RECONOCIDOS:\n")
+        for linea in logs:
+            file2.write(linea + "\n")
+
+        file2.write("\nERRORES LÉXICOS:\n")
+        if lexer.errores:
+            for e in lexer.errores:
+                file2.write(e + "\n")
+        else:
+            file2.write("Ninguno\n")
     
     print(f"Log generado: {ruta_log}")
     
     
-# Uso de algoritmo por interante
+# Uso de algoritmo por integrante
 
 if __name__ == '__main__':
     
@@ -194,6 +203,7 @@ if __name__ == '__main__':
     
     #algoritmo julio: 
     #algoritmo valeria:
+    probar_lexer('algoritmos/algoritmo_valeria.lua', 'ValeriaGavela')
     #algoritmo juan:
     
     pass
