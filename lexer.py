@@ -203,6 +203,7 @@ if __name__ == '__main__':
     
     #algoritmo julio:
     probar_lexer('algoritmos/algoritmo_julio.lua', 'JulioLlerena')
+    probar_lexer('algoritmos/algoritmo_erroresJulio.lua', 'JulioLlerena')
     #algoritmo valeria:
     probar_lexer('algoritmos/algoritmo_valeria.lua', 'ValeriaGavela')
     #algoritmo juan:
