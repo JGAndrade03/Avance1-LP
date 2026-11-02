@@ -57,8 +57,42 @@ t_LENGTH = r'\#'
 
 
 # Funcionalidad de tipos de datos primitivos y comentarios (Valeria)
-#
-#
+tokens_valeria = [
+    'FLOTANTE', 'ENTERO', 'CADENA'
+]
+
+# Regla para comentarios multilínea (debe ir antes que el de una línea)
+def t_COMMENT_BLOCK(t):
+    r'--\[\[[\s\S]*?\]\]'
+    t.lexer.lineno += t.value.count('\n')   # mantener el conteo de líneas
+    pass # Se ignora, no devuelve token
+
+# Regla para comentarios de una sola línea
+def t_COMMENT_LINE(t):
+    r'--.*'
+    pass # Se ignora, no devuelve token
+
+# Tipos de datos primitivos (Valeria)
+def t_HEXADECIMAL(t):
+    r'0[xX][0-9a-fA-F]+'
+    t.value = int(t.value, 16)
+    return t
+
+def t_FLOTANTE(t):
+    r'(?:\d+\.\d*|\.\d+)(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+'
+    t.value = float(t.value)
+    return t
+
+def t_ENTERO(t):
+    r'\d+'
+    t.value = int(t.value)
+    return t
+
+def t_CADENA(t):
+    r'"(?:[^"\\\n]|\\.)*"|\'(?:[^\'\\\n]|\\.)*\'|\[\[[\s\S]*?\]\]'
+    t.value = str(t.value)
+    return t
+
 #------------------------------------------------------------------
 
 
@@ -69,7 +103,7 @@ t_LENGTH = r'\#'
 tokens_juan = [ 'ID', 'LPAREN', 'RPAREN', 'LBRACE', 'RBRACE', 'LBRACKET', 'RBRACKET', 'COMMA', 'SEMICOLON', 'DOT', 'COLON', 'END_DELIM']
 
 tokens = list(dict.fromkeys(
-    list(reserved.values()) + tokens_julio + tokens_juan
+    list(reserved.values()) + tokens_julio + tokens_juan + tokens_valeria
 ))
 
 #Reglas de delimitadores:
