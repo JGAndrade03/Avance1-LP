@@ -1,0 +1,46 @@
+TOKENS RECONOCIDOS:
+Linea 3 	 Tipo: LOCAL 	 Valor: local
+Linea 3 	 Tipo: ID 	 Valor: numero
+Linea 3 	 Tipo: ASSIGN 	 Valor: =
+Linea 3 	 Tipo: ENTERO 	 Valor: 10
+Linea 4 	 Tipo: LOCAL 	 Valor: local
+Linea 4 	 Tipo: ID 	 Valor: texto
+Linea 4 	 Tipo: ASSIGN 	 Valor: =
+Linea 4 	 Tipo: CADENA 	 Valor: "prueba"
+Linea 6 	 Tipo: ID 	 Valor: numero
+Linea 6 	 Tipo: ASSIGN 	 Valor: =
+Linea 6 	 Tipo: ID 	 Valor: numero
+Linea 6 	 Tipo: ENTERO 	 Valor: 2
+Linea 7 	 Tipo: ID 	 Valor: texto
+Linea 7 	 Tipo: ASSIGN 	 Valor: =
+Linea 7 	 Tipo: ID 	 Valor: texto
+Linea 7 	 Tipo: CADENA 	 Valor: " con error"
+Linea 8 	 Tipo: LOCAL 	 Valor: local
+Linea 8 	 Tipo: ID 	 Valor: resultado
+Linea 8 	 Tipo: ASSIGN 	 Valor: =
+Linea 8 	 Tipo: ID 	 Valor: numero
+Linea 8 	 Tipo: ENTERO 	 Valor: 5
+Linea 9 	 Tipo: LOCAL 	 Valor: local
+Linea 9 	 Tipo: ID 	 Valor: plantilla
+Linea 9 	 Tipo: ASSIGN 	 Valor: =
+Linea 9 	 Tipo: ID 	 Valor: texto
+Linea 9 	 Tipo: ID 	 Valor: sin
+Linea 9 	 Tipo: ID 	 Valor: comillas
+Linea 11 	 Tipo: IF 	 Valor: if
+Linea 11 	 Tipo: ID 	 Valor: numero
+Linea 11 	 Tipo: GE 	 Valor: >=
+Linea 11 	 Tipo: ENTERO 	 Valor: 0
+Linea 11 	 Tipo: THEN 	 Valor: then
+Linea 12 	 Tipo: ID 	 Valor: numero
+Linea 12 	 Tipo: ASSIGN 	 Valor: =
+Linea 12 	 Tipo: ID 	 Valor: numero
+Linea 12 	 Tipo: PLUS 	 Valor: +
+Linea 12 	 Tipo: ENTERO 	 Valor: 1
+Linea 13 	 Tipo: END_DELIM 	 Valor: end
+
+ERRORES LÉXICOS:
+Error léxico en línea 6: carácter no reconocido '@'
+Error léxico en línea 7: carácter no reconocido '$'
+Error léxico en línea 8: carácter no reconocido '?'
+Error léxico en línea 9: carácter no reconocido '`'
+Error léxico en línea 9: carácter no reconocido '`'
