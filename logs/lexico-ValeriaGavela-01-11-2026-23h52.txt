@@ -1,0 +1,84 @@
+TOKENS RECONOCIDOS:
+Linea 5 	 Tipo: LOCAL 	 Valor: local
+Linea 5 	 Tipo: ID 	 Valor: entero
+Linea 5 	 Tipo: ASSIGN 	 Valor: =
+Linea 5 	 Tipo: ENTERO 	 Valor: 42
+Linea 6 	 Tipo: LOCAL 	 Valor: local
+Linea 6 	 Tipo: ID 	 Valor: flotante
+Linea 6 	 Tipo: ASSIGN 	 Valor: =
+Linea 6 	 Tipo: FLOTANTE 	 Valor: 3.14
+Linea 7 	 Tipo: LOCAL 	 Valor: local
+Linea 7 	 Tipo: ID 	 Valor: cientifico
+Linea 7 	 Tipo: ASSIGN 	 Valor: =
+Linea 7 	 Tipo: FLOTANTE 	 Valor: 200000.0
+Linea 8 	 Tipo: LOCAL 	 Valor: local
+Linea 8 	 Tipo: ID 	 Valor: sin_cero
+Linea 8 	 Tipo: ASSIGN 	 Valor: =
+Linea 8 	 Tipo: FLOTANTE 	 Valor: 0.5
+Linea 9 	 Tipo: LOCAL 	 Valor: local
+Linea 9 	 Tipo: ID 	 Valor: hexa
+Linea 9 	 Tipo: ASSIGN 	 Valor: =
+Linea 9 	 Tipo: HEXADECIMAL 	 Valor: 255
+Linea 10 	 Tipo: LOCAL 	 Valor: local
+Linea 10 	 Tipo: ID 	 Valor: hexa2
+Linea 10 	 Tipo: ASSIGN 	 Valor: =
+Linea 10 	 Tipo: HEXADECIMAL 	 Valor: 6699
+Linea 11 	 Tipo: LOCAL 	 Valor: local
+Linea 11 	 Tipo: ID 	 Valor: saludo
+Linea 11 	 Tipo: ASSIGN 	 Valor: =
+Linea 11 	 Tipo: CADENA 	 Valor: "Hola, mundo"
+Linea 12 	 Tipo: LOCAL 	 Valor: local
+Linea 12 	 Tipo: ID 	 Valor: otro
+Linea 12 	 Tipo: ASSIGN 	 Valor: =
+Linea 12 	 Tipo: CADENA 	 Valor: 'Lua \'simple\''
+Linea 13 	 Tipo: LOCAL 	 Valor: local
+Linea 13 	 Tipo: ID 	 Valor: larga
+Linea 13 	 Tipo: ASSIGN 	 Valor: =
+Linea 13 	 Tipo: CADENA 	 Valor: [[Cadena
+larga de varias líneas]]
+Linea 14 	 Tipo: LOCAL 	 Valor: local
+Linea 14 	 Tipo: ID 	 Valor: activo
+Linea 14 	 Tipo: ASSIGN 	 Valor: =
+Linea 14 	 Tipo: TRUE 	 Valor: true
+Linea 15 	 Tipo: LOCAL 	 Valor: local
+Linea 15 	 Tipo: ID 	 Valor: inactivo
+Linea 15 	 Tipo: ASSIGN 	 Valor: =
+Linea 15 	 Tipo: FALSE 	 Valor: false
+Linea 16 	 Tipo: LOCAL 	 Valor: local
+Linea 16 	 Tipo: ID 	 Valor: nada
+Linea 16 	 Tipo: ASSIGN 	 Valor: =
+Linea 16 	 Tipo: NIL 	 Valor: nil
+Linea 20 	 Tipo: LOCAL 	 Valor: local
+Linea 20 	 Tipo: ID 	 Valor: suma
+Linea 20 	 Tipo: ASSIGN 	 Valor: =
+Linea 20 	 Tipo: ID 	 Valor: entero
+Linea 20 	 Tipo: PLUS 	 Valor: +
+Linea 20 	 Tipo: ID 	 Valor: flotante
+Linea 22 	 Tipo: LOCAL 	 Valor: local
+Linea 22 	 Tipo: ID 	 Valor: h
+Linea 22 	 Tipo: ASSIGN 	 Valor: =
+Linea 22 	 Tipo: ENTERO 	 Valor: 0
+Linea 22 	 Tipo: ID 	 Valor: xZZ
+Linea 23 	 Tipo: LOCAL 	 Valor: local
+Linea 23 	 Tipo: ID 	 Valor: x
+Linea 23 	 Tipo: ASSIGN 	 Valor: =
+Linea 23 	 Tipo: ID 	 Valor: sin
+Linea 23 	 Tipo: ID 	 Valor: cerrar
+Linea 24 	 Tipo: LOCAL 	 Valor: local
+Linea 24 	 Tipo: ID 	 Valor: y
+Linea 24 	 Tipo: ASSIGN 	 Valor: =
+Linea 24 	 Tipo: ID 	 Valor: comillas
+Linea 24 	 Tipo: ID 	 Valor: distintas
+Linea 25 	 Tipo: LOCAL 	 Valor: local
+Linea 25 	 Tipo: ID 	 Valor: z
+Linea 25 	 Tipo: ASSIGN 	 Valor: =
+Linea 25 	 Tipo: ENTERO 	 Valor: 5
+Linea 28 	 Tipo: LOCAL 	 Valor: local
+Linea 28 	 Tipo: ID 	 Valor: w
+Linea 28 	 Tipo: ASSIGN 	 Valor: =
+Linea 28 	 Tipo: ENTERO 	 Valor: 10
+
+ERRORES LÉXICOS:
+Error léxico en línea 23: carácter no reconocido '"'
+Error léxico en línea 24: carácter no reconocido '''
+Error léxico en línea 24: carácter no reconocido '"'
