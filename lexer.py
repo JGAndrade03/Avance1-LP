@@ -58,7 +58,7 @@ t_LENGTH = r'\#'
 
 # Funcionalidad de tipos de datos primitivos y comentarios (Valeria)
 tokens_valeria = [
-    'FLOTANTE', 'ENTERO', 'CADENA'
+    'FLOTANTE', 'ENTERO', 'CADENA','HEXADECIMAL'
 ]
 
 # Regla para comentarios multilínea (debe ir antes que el de una línea)
@@ -205,5 +205,6 @@ if __name__ == '__main__':
     #algoritmo valeria:
     probar_lexer('algoritmos/algoritmo_valeria.lua', 'ValeriaGavela')
     #algoritmo juan:
+    probar_lexer('algoritmos/algoritmo_juan.lua','JuanGualotuna')
     
     pass
