@@ -201,7 +201,8 @@ if __name__ == '__main__':
     
     #Ejecución de pruebas individuales:
     
-    #algoritmo julio: 
+    #algoritmo julio:
+    probar_lexer('algoritmos/algoritmo_julio.lua', 'JulioLlerena')
     #algoritmo valeria:
     probar_lexer('algoritmos/algoritmo_valeria.lua', 'ValeriaGavela')
     #algoritmo juan:
