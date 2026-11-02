@@ -1,0 +1,29 @@
+TOKENS RECONOCIDOS:
+Linea 1 	 Tipo: ID 	 Valor: jugador
+Linea 1 	 Tipo: ASSIGN 	 Valor: =
+Linea 1 	 Tipo: LBRACE 	 Valor: {
+Linea 1 	 Tipo: ID 	 Valor: nombre
+Linea 1 	 Tipo: ASSIGN 	 Valor: =
+Linea 1 	 Tipo: CADENA 	 Valor: "Mario"
+Linea 1 	 Tipo: COMMA 	 Valor: ,
+Linea 1 	 Tipo: ID 	 Valor: vida
+Linea 1 	 Tipo: ASSIGN 	 Valor: =
+Linea 1 	 Tipo: ENTERO 	 Valor: 3
+Linea 1 	 Tipo: RBRACE 	 Valor: }
+Linea 2 	 Tipo: ID 	 Valor: posicion
+Linea 2 	 Tipo: LBRACKET 	 Valor: [
+Linea 2 	 Tipo: ENTERO 	 Valor: 1
+Linea 2 	 Tipo: RBRACKET 	 Valor: ]
+Linea 2 	 Tipo: ASSIGN 	 Valor: =
+Linea 2 	 Tipo: ENTERO 	 Valor: 100
+Linea 3 	 Tipo: ID 	 Valor: jugador
+Linea 3 	 Tipo: COLON 	 Valor: :
+Linea 3 	 Tipo: ID 	 Valor: actualizador
+Linea 3 	 Tipo: LPAREN 	 Valor: (
+Linea 3 	 Tipo: ID 	 Valor: posicion
+Linea 3 	 Tipo: RPAREN 	 Valor: )
+Linea 3 	 Tipo: SEMICOLON 	 Valor: ;
+Linea 4 	 Tipo: END_DELIM 	 Valor: end
+
+ERRORES LÉXICOS:
+Ninguno
