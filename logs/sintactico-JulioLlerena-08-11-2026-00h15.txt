@@ -1,0 +1,18 @@
+INSTRUCCIONES RECONOCIDAS:
+Ninguna
+
+ERRORES DE ANÁLISIS:
+Error sintáctico en línea 4: token CONCAT ('..') inesperado.
+Error sintáctico en línea 5: token LENGTH ('#') inesperado.
+Error sintáctico en línea 10: token IF ('if') inesperado.
+Error sintáctico en línea 12: token END_DELIM ('end') inesperado.
+Error sintáctico en línea 16: token ELSEIF ('elseif') inesperado.
+Error sintáctico en línea 18: token ELSE ('else') inesperado.
+Error sintáctico en línea 20: token END_DELIM ('end') inesperado.
+Error sintáctico en línea 24: token END_DELIM ('end') inesperado.
+Error sintáctico en línea 26: token DO ('do') inesperado.
+Error sintáctico en línea 28: token END_DELIM ('end') inesperado.
+Error sintáctico en línea 30: token LBRACE ('{') inesperado.
+Error sintáctico en línea 30: token ASSIGN ('=') inesperado.
+Error sintáctico en línea 39: token UNTIL ('until') inesperado.
+Error sintáctico en línea 43: token RETURN ('return') inesperado.
