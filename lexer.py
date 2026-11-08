@@ -27,6 +27,7 @@ reserved = {
     'false': 'FALSE',
     'nil': 'NIL',
     'goto': 'GOTO',
+    'print': 'PRINT',
 }
 
 tokens_julio = [
@@ -100,7 +101,7 @@ def t_CADENA(t):
 # Funcionalidad de Variables, Delimitadores y Tablas (Juan Andrés Gualotuña)
 
 
-tokens_juan = [ 'ID', 'LPAREN', 'RPAREN', 'LBRACE', 'RBRACE', 'LBRACKET', 'RBRACKET', 'COMMA', 'SEMICOLON', 'DOT', 'COLON', 'END_DELIM']
+tokens_juan = [ 'ID', 'LPAREN', 'RPAREN', 'LBRACE', 'RBRACE', 'LBRACKET', 'RBRACKET', 'COMMA', 'SEMICOLON', 'DOT', 'COLON', 'END_DELIM', 'IO_READ']
 
 tokens = list(dict.fromkeys(
     list(reserved.values()) + tokens_julio + tokens_juan + tokens_valeria
@@ -120,6 +121,9 @@ t_DOT =         r'\.'
 t_COLON =       r':'
 
 #Reglas para identificadores y validar palabras reservadas:
+def t_IO_READ(t):
+    r'io\.read\b'
+    return t
 
 def t_ID(t):
     r'[a-zA-Z_][a-zA-Z0-9_]*'  #Uso de expresiones regulares
