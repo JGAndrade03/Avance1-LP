@@ -35,7 +35,21 @@ class BinaryExpression:
     right: Expression
 
 
-Expression: TypeAlias = Literal | Variable | UnaryExpression | BinaryExpression
+@dataclass(frozen=True)
+class ArrayLiteral:
+    elements: tuple[Expression, ...]
+
+
+@dataclass(frozen=True)
+class FunctionCall:
+    name: str | Expression  # str si se llama por nombre; Expression si es t.f(x), f(1)(2)...
+    arguments: tuple[Expression, ...]
+
+
+@dataclass(frozen=True)
+class IndexExpression:
+    collection: Expression
+    index: Expression
 
 
 @dataclass(frozen=True)
@@ -49,92 +63,155 @@ class VariableDeclaration:
 class Assignment:
     names: tuple[str, ...]
     values: tuple[Expression, ...]
-    
-    
+
 
 # --- JUAN GUALOTUÑA ---
+
+
 @dataclass(frozen=True)
 class ForLoop:
     iterator: str
     start: Expression
     end: Expression
     step: Expression | None
-    body: list[Statement]
+    body: tuple[Statement, ...]
+
 
 @dataclass(frozen=True)
 class DictionaryField:
     key: str | Expression
     value: Expression
 
+
 @dataclass(frozen=True)
 class Dictionary:
     fields: tuple[DictionaryField, ...]
 
+
 @dataclass(frozen=True)
 class AnonymousFunction:
     params: tuple[str, ...]
-    body: list[Statement]
+    body: tuple[Statement, ...]
+
 
 @dataclass(frozen=True)
 class PrintStatement:
     arguments: tuple[Expression, ...]
 
+
 @dataclass(frozen=True)
 class ReadExpression:
     pass
 
-
 #----------------------------------------------------
 
-
-# --- INICIO APORTE VALERIA GAVELA: (matriz, acceso, función, return, while) ---
-@dataclass(frozen=True)
-class Index:
-    """Acceso por índice: m[i], m[i][j]."""
-    table: Expression
-    key: Expression
-
-
+# --- INICIO APORTE VALERIA GAVELA: nodos (matriz, campos, métodos) ---
 @dataclass(frozen=True)
 class Matrix:
-    """Matriz como tabla de tablas: {{1, 2}, {3, 4}}."""
+    """Matriz: tabla cuyas filas son tablas, p. ej. {{1, 2}, {3, 4}}."""
     rows: tuple[tuple[Expression, ...], ...]
 
 
 @dataclass(frozen=True)
-class FunctionCall:
-    function: Expression
-    args: tuple[Expression, ...]
+class FieldAccess:
+    """Acceso a campo: persona.nombre"""
+    target: Expression
+    field: str
 
 
 @dataclass(frozen=True)
-class FunctionDefinition:
-    name: str
-    params: tuple[str, ...]
-    body: tuple[Statement, ...]
-    local: bool
-
-
-@dataclass(frozen=True)
-class Return:
-    values: tuple[Expression, ...]
-
-
-@dataclass(frozen=True)
-class While:
-    condition: Expression
-    body: tuple[Statement, ...]
+class MethodCall:
+    """Llamada a método: obj:metodo(args)"""
+    target: Expression
+    method: str
+    arguments: tuple[Expression, ...]
 # --- FIN APORTE VALERIA GAVELA ---
 
 
 Expression: TypeAlias = (
-    Literal | Variable | UnaryExpression | BinaryExpression | Dictionary
-    | AnonymousFunction | ReadExpression | Index | Matrix | FunctionCall
+    Literal
+    | Variable
+    | UnaryExpression
+    | BinaryExpression
+    | ArrayLiteral
+    | FunctionCall
+    | IndexExpression
+    | Matrix
+    | FieldAccess
+    | MethodCall
+    | Dictionary
+    | AnonymousFunction
+    | ReadExpression
 )
 
+
+@dataclass(frozen=True)
+class IndexedAssignment:
+    target: IndexExpression
+    values: tuple[Expression, ...]
+
+
+@dataclass(frozen=True)
+class IfStatement:
+    condition: Expression
+    then_body: tuple[Statement, ...]
+    else_body: tuple[Statement, ...]
+
+
+@dataclass(frozen=True)
+class FunctionDeclaration:
+    name: str
+    parameters: tuple[str, ...]
+    body: tuple[Statement, ...]
+    local: bool = False  # Valeria: True en "local function"
+
+
+@dataclass(frozen=True)
+class ReturnStatement:
+    values: tuple[Expression, ...]
+
+
+# --- INICIO APORTE VALERIA GAVELA: instrucciones (while, repeat, break, asignación a campos) ---
+@dataclass(frozen=True)
+class WhileLoop:
+    condition: Expression
+    body: tuple[Statement, ...]
+
+
+@dataclass(frozen=True)
+class RepeatLoop:
+    body: tuple[Statement, ...]
+    condition: Expression
+
+
+@dataclass(frozen=True)
+class BreakStatement:
+    pass
+
+
+@dataclass(frozen=True)
+class TargetAssignment:
+    """Asignación a campos o múltiple: p.edad = 3, a[1], b.x = 1, 2"""
+    targets: tuple[Expression, ...]
+    values: tuple[Expression, ...]
+# --- FIN APORTE VALERIA GAVELA ---
+
+
 Statement: TypeAlias = (
-    VariableDeclaration | Assignment | ForLoop | PrintStatement
-    | FunctionDefinition | Return | While | FunctionCall
+    VariableDeclaration
+    | Assignment
+    | IndexedAssignment
+    | IfStatement
+    | FunctionDeclaration
+    | ReturnStatement
+    | ForLoop
+    | PrintStatement
+    | WhileLoop
+    | RepeatLoop
+    | BreakStatement
+    | TargetAssignment
+    | FunctionCall
+    | MethodCall
 )
 
 
@@ -143,19 +220,20 @@ class ParseError(ValueError):
 
 
 precedence = (
-    ("left", "OR"),  # Valeria
-    ("left", "AND"),  # Valeria
-    ("left", "LT", "LE", "GT", "GE", "EQ", "NE"),  # Valeria: relacionales
+    ("left", "OR"),
+    ("left", "AND"),
+    ("left", "EQ", "NE", "LT", "LE", "GT", "GE"),  # Valeria: relacionales
     ("right", "CONCAT"),  # Valeria
     ("left", "PLUS", "MINUS"),
     ("left", "MULTIPLY", "DIVIDE", "FLOOR_DIVIDE", "MODULO"),
-    ("right", "UMINUS"),  # también usado por NOT y # (Valeria)
+    ("right", "NOT"),
+    ("right", "UMINUS"),
     ("right", "POWER"),
 )
 
 
 def p_program(p):
-    "program : block"
+    "program : statements"
     p[0] = p[1]
 
 
@@ -174,9 +252,68 @@ def p_statement_local_declaration(p):
     p[0] = VariableDeclaration(tuple(p[2]), tuple(p[3]), local=True)
 
 
-def p_statement_assignment(p):
-    "statement : varlist ASSIGN expressions"  # Valeria: antes "names"; admite m[i][j] = x
-    p[0] = Assignment(tuple(p[1]), tuple(p[3]))
+#--- JUAN GUALOTUÑA -----
+
+
+def p_statement_for(p):
+    """statement : FOR ID ASSIGN expression COMMA expression DO statements END_DELIM
+                 | FOR ID ASSIGN expression COMMA expression COMMA expression DO statements END_DELIM"""
+    if len(p) == 10:
+        p[0] = ForLoop(p[2], p[4], p[6], None, tuple(p[8]))
+    else:
+        p[0] = ForLoop(p[2], p[4], p[6], p[8], tuple(p[10]))
+
+
+def p_statement_if(p):
+    "statement : IF expression THEN statements else_clause END_DELIM"
+    p[0] = IfStatement(p[2], tuple(p[4]), tuple(p[5]))
+
+
+def p_else_clause_else(p):
+    "else_clause : ELSE statements"
+    p[0] = p[2]
+
+
+def p_else_clause_elseif(p):
+    "else_clause : ELSEIF expression THEN statements else_clause"
+    p[0] = [IfStatement(p[2], tuple(p[4]), tuple(p[5]))]
+
+
+def p_else_clause_empty(p):
+    "else_clause : empty"
+    p[0] = []
+
+
+def p_statement_function_declaration(p):
+    "statement : FUNCTION ID LPAREN optional_parameters RPAREN statements END_DELIM"
+    p[0] = FunctionDeclaration(p[2], tuple(p[4]), tuple(p[6]))
+
+
+def p_optional_parameters(p):
+    """optional_parameters : parameters
+                           | empty"""
+    p[0] = p[1] if p[1] is not None else []
+
+
+def p_parameters_single(p):
+    "parameters : ID"
+    p[0] = [p[1]]
+
+
+def p_parameters_multiple(p):
+    "parameters : parameters COMMA ID"
+    p[0] = p[1] + [p[3]]
+
+
+def p_statement_return(p):
+    "statement : RETURN optional_return_values"
+    p[0] = ReturnStatement(tuple(p[2]))
+
+
+def p_optional_return_values(p):
+    """optional_return_values : expressions
+                              | empty"""
+    p[0] = p[1] if p[1] is not None else []
 
 
 def p_statement_semicolon(p):
@@ -210,6 +347,47 @@ def p_expressions_multiple(p):
     p[0] = p[1] + [p[3]]
 
 
+def p_expression_array(p):
+    "expression : LBRACE optional_array_elements RBRACE"
+    elements = tuple(p[2])
+    # Valeria: una tabla cuyos elementos son todos tablas se reconoce como matriz
+    if elements and all(isinstance(e, ArrayLiteral) for e in elements):
+        p[0] = Matrix(tuple(e.elements for e in elements))
+    else:
+        p[0] = ArrayLiteral(elements)
+
+
+def p_expression_dictionary(p):
+    "expression : LBRACE dictionary_fields RBRACE"
+    p[0] = Dictionary(tuple(p[2]))
+
+
+def p_dictionary_fields_single(p):
+    "dictionary_fields : dictionary_field"
+    p[0] = [p[1]]
+
+
+def p_dictionary_fields_multiple(p):
+    "dictionary_fields : dictionary_fields COMMA dictionary_field"
+    p[0] = p[1] + [p[3]]
+
+
+def p_dictionary_field_id(p):
+    "dictionary_field : ID ASSIGN expression"
+    p[0] = DictionaryField(p[1], p[3])
+
+
+def p_dictionary_field_bracket(p):
+    "dictionary_field : LBRACKET expression RBRACKET ASSIGN expression"
+    p[0] = DictionaryField(p[2], p[5])
+
+
+def p_optional_array_elements(p):
+    """optional_array_elements : expressions
+                               | empty"""
+    p[0] = p[1] if p[1] is not None else []
+
+
 def p_expression_literal(p):
     """expression : ENTERO
                   | FLOTANTE
@@ -224,6 +402,40 @@ def p_expression_boolean_nil(p):
                   | NIL"""
     p[0] = Literal({"TRUE": True, "FALSE": False, "NIL": None}[p.slice[1].type])
 
+
+def p_optional_arguments(p):
+    """optional_arguments : expressions
+                          | empty"""
+    p[0] = p[1] if p[1] is not None else []
+
+
+def p_expression_anonymous_function(p):
+    "expression : FUNCTION LPAREN optional_names RPAREN statements END_DELIM"
+    p[0] = AnonymousFunction(tuple(p[3]), tuple(p[5]))
+
+
+def p_optional_names(p):
+    """optional_names : names
+                      | empty"""
+    p[0] = p[1] if p[1] is not None else []
+
+
+def p_statement_print(p):
+    "statement : PRINT LPAREN optional_expressions RPAREN"
+    p[0] = PrintStatement(tuple(p[3]))
+
+
+def p_optional_expressions(p):
+    """optional_expressions : expressions
+                            | empty"""
+    p[0] = p[1] if p[1] is not None else []
+
+
+def p_expression_io_read(p):
+    "expression : IO_READ LPAREN RPAREN"
+    p[0] = ReadExpression()
+
+# ---------------------------------------------------------------------
 
 def p_expression_grouped(p):
     "expression : LPAREN expression RPAREN"
@@ -242,91 +454,45 @@ def p_expression_binary(p):
                   | expression DIVIDE expression
                   | expression FLOOR_DIVIDE expression
                   | expression MODULO expression
-                  | expression POWER expression
-                  | expression CONCAT expression
-                  | expression EQ expression
+                  | expression POWER expression"""
+    p[0] = BinaryExpression(p[2], p[1], p[3])
+
+
+# --- INICIO APORTE VALERIA GAVELA ---
+# Expresiones booleanas: relacionales (== ~= < <= > >=), lógicas (and, or, not)
+def p_expression_relational(p):
+    """expression : expression EQ expression
                   | expression NE expression
                   | expression LT expression
                   | expression LE expression
                   | expression GT expression
-                  | expression GE expression
-                  | expression AND expression
+                  | expression GE expression"""
+    p[0] = BinaryExpression(p[2], p[1], p[3])
+
+
+def p_expression_logical(p):
+    """expression : expression AND expression
                   | expression OR expression"""
     p[0] = BinaryExpression(p[2], p[1], p[3])
-    
-    
-#--- JUAN GUALOTUÑA -----
-
-# Bucle FOR:
-def p_statement_for(p):
-    """statement : FOR ID ASSIGN expression COMMA expression DO statements END_DELIM
-                 | FOR ID ASSIGN expression COMMA expression COMMA expression DO statements END_DELIM"""
-    if len(p) == 10:
-        p[0] = ForLoop(p[2], p[4], p[6], None, p[8])
-    else:
-        p[0] = ForLoop(p[2], p[4], p[6], p[8], p[9])
-
-# Diccionarios:
-def p_expression_dictionary(p):
-    """expression : LBRACE dictionary_fields RBRACE
-                  | LBRACE RBRACE"""
-    p[0] = Dictionary(tuple(p[2])) if len(p) == 4 else Dictionary(())
-
-def p_dictionary_fields_single(p):
-    "dictionary_fields : dictionary_field"
-    p[0] = [p[1]]
-
-def p_dictionary_fields_multiple(p):
-    "dictionary_fields : dictionary_fields COMMA dictionary_field"
-    p[0] = p[1] + [p[3]]
-
-def p_dictionary_field_id(p):
-    "dictionary_field : ID ASSIGN expression"
-    p[0] = DictionaryField(p[1], p[3])
-
-def p_dictionary_field_bracket(p):
-    "dictionary_field : LBRACKET expression RBRACKET ASSIGN expression"
-    p[0] = DictionaryField(p[2], p[5])
-
-# Funciones Anónimas:
-def p_expression_anonymous_function(p):
-    "expression : FUNCTION LPAREN optional_names RPAREN block END_DELIM"
-    p[0] = AnonymousFunction(tuple(p[3]), p[5])
-
-def p_optional_names(p):
-    """optional_names : names
-                      | empty"""
-    p[0] = p[1] if p[1] is not None else []
-
-# Print y IO.Read:
-def p_statement_print(p):
-    "statement : PRINT LPAREN optional_expressions RPAREN"
-    p[0] = PrintStatement(tuple(p[3]))
-
-def p_optional_expressions(p):
-    """optional_expressions : expressions
-                            | empty"""
-    p[0] = p[1] if p[1] is not None else []
-
-def p_expression_io_read(p):
-    "expression : IO_READ LPAREN RPAREN"
-    p[0] = ReadExpression()
-    
-# ---------------------------------------------------------------------
 
 
-# --- INICIO APORTE VALERIA GAVELA ---
-# Reglas: expresiones booleanas (relacionales y lógicas), matrices,
-# definición de funciones (declaración y llamada) y estructura de control while.
-
-# Operadores unarios: not, # (longitud)
-def p_expression_unary_not_length(p):
-    """expression : NOT expression %prec UMINUS
-                  | LENGTH expression %prec UMINUS"""
-    p[0] = UnaryExpression(p[1], p[2])
+def p_expression_not(p):
+    "expression : NOT expression"
+    p[0] = UnaryExpression("not", p[2])
 
 
-# Variables y acceso por índice: x, m[i], m[i][j]
+# Operadores: concatenación (..) y longitud (#), p. ej. #matriz
+def p_expression_concat(p):
+    "expression : expression CONCAT expression"
+    p[0] = BinaryExpression(p[2], p[1], p[3])
+
+
+def p_expression_length(p):
+    "expression : LENGTH expression %prec UMINUS"
+    p[0] = UnaryExpression("#", p[2])
+
+
+# Variables y accesos: x, m[i], m[i][j] (matriz), p.nombre (campo)
 def p_var_name(p):
     "var : ID"
     p[0] = Variable(p[1])
@@ -334,7 +500,12 @@ def p_var_name(p):
 
 def p_var_index(p):
     "var : prefixexp LBRACKET expression RBRACKET"
-    p[0] = Index(p[1], p[3])
+    p[0] = IndexExpression(p[1], p[3])
+
+
+def p_var_field(p):
+    "var : prefixexp DOT ID"
+    p[0] = FieldAccess(p[1], p[3])
 
 
 def p_varlist(p):
@@ -354,27 +525,28 @@ def p_expression_prefixexp(p):
     p[0] = p[1]
 
 
-# Matriz: {{1, 2, 3}, {4, 5, 6}}
-def p_expression_matrix(p):
-    "expression : LBRACE matrix_rows RBRACE"
-    p[0] = Matrix(tuple(p[2]))
+# Asignación: x = 1 | m[i][j] = 1 | p.campo = 1 | a, b[1] = 1, 2
+def p_statement_assignment(p):
+    "statement : varlist ASSIGN expressions"
+    targets, values = p[1], tuple(p[3])
+    if all(isinstance(t, Variable) for t in targets):
+        p[0] = Assignment(tuple(t.name for t in targets), values)
+    elif len(targets) == 1 and isinstance(targets[0], IndexExpression):
+        p[0] = IndexedAssignment(targets[0], values)
+    else:
+        p[0] = TargetAssignment(tuple(targets), values)
 
 
-def p_matrix_rows(p):
-    """matrix_rows : matrix_row
-                   | matrix_rows COMMA matrix_row"""
-    p[0] = [p[1]] if len(p) == 2 else p[1] + [p[3]]
-
-
-def p_matrix_row(p):
-    "matrix_row : LBRACE expressions RBRACE"
-    p[0] = tuple(p[2])
-
-
-# Llamada a función: calcularArea(10, 5)
+# Llamadas a función: f(x), t.f(x), f(1)(2), obj:metodo(x)
 def p_functioncall(p):
-    "functioncall : prefixexp LPAREN optional_expressions RPAREN"
-    p[0] = FunctionCall(p[1], tuple(p[3]))
+    "functioncall : prefixexp LPAREN optional_arguments RPAREN"
+    callee = p[1].name if isinstance(p[1], Variable) else p[1]
+    p[0] = FunctionCall(callee, tuple(p[3]))
+
+
+def p_functioncall_method(p):
+    "functioncall : prefixexp COLON ID LPAREN optional_arguments RPAREN"
+    p[0] = MethodCall(p[1], p[3], tuple(p[5]))
 
 
 def p_statement_functioncall(p):
@@ -382,45 +554,48 @@ def p_statement_functioncall(p):
     p[0] = p[1]
 
 
-# Bloque: instrucciones con return opcional al final
-def p_block(p):
-    "block : statements optional_return"
-    p[0] = [s for s in p[1] if s is not None] + ([p[2]] if p[2] is not None else [])
+# Funciones:
+#   - function a.b.c(...)       funciones como campos de tabla
+#   - function obj:metodo(...)  métodos
+#   - local function f(...)     funciones locales
+#   - llamadas t.f(x), f(1)(2), obj:m(x) (ver functioncall arriba)
+def p_function_path(p):
+    """function_path : ID DOT ID
+                     | function_path DOT ID"""
+    p[0] = f"{p[1]}.{p[3]}"
 
 
-def p_optional_return(p):
-    """optional_return : return_statement
-                       | empty"""
-    p[0] = p[1]
+def p_function_qualified_name(p):
+    """function_qualified_name : function_path
+                               | function_path COLON ID
+                               | ID COLON ID"""
+    p[0] = p[1] if len(p) == 2 else f"{p[1]}:{p[3]}"
 
 
-def p_return_statement(p):
-    """return_statement : RETURN optional_expressions
-                        | RETURN optional_expressions SEMICOLON"""
-    p[0] = Return(tuple(p[2]))
+def p_statement_qualified_function_declaration(p):
+    "statement : FUNCTION function_qualified_name LPAREN optional_parameters RPAREN statements END_DELIM"
+    p[0] = FunctionDeclaration(p[2], tuple(p[4]), tuple(p[6]))
 
 
-# Definición de funciones: function nombre(params) ... end
-def p_funcname(p):
-    """funcname : ID
-                | funcname DOT ID"""
-    p[0] = p[1] if len(p) == 2 else f"{p[1]}.{p[3]}"
+def p_statement_local_function_declaration(p):
+    "statement : LOCAL FUNCTION ID LPAREN optional_parameters RPAREN statements END_DELIM"
+    p[0] = FunctionDeclaration(p[3], tuple(p[5]), tuple(p[7]), local=True)
 
 
-def p_statement_function_def(p):
-    "statement : FUNCTION funcname LPAREN optional_names RPAREN block END_DELIM"
-    p[0] = FunctionDefinition(p[2], tuple(p[4]), tuple(p[6]), local=False)
-
-
-def p_statement_local_function_def(p):
-    "statement : LOCAL FUNCTION ID LPAREN optional_names RPAREN block END_DELIM"
-    p[0] = FunctionDefinition(p[3], tuple(p[5]), tuple(p[7]), local=True)
-
-
-# Estructura de control: while
+# Estructuras de control: while, repeat ... until, break
 def p_statement_while(p):
-    "statement : WHILE expression DO block END_DELIM"
-    p[0] = While(p[2], tuple(p[4]))
+    "statement : WHILE expression DO statements END_DELIM"
+    p[0] = WhileLoop(p[2], tuple(p[4]))
+
+
+def p_statement_repeat(p):
+    "statement : REPEAT statements UNTIL expression"
+    p[0] = RepeatLoop(tuple(p[2]), p[4])
+
+
+def p_statement_break(p):
+    "statement : BREAK"
+    p[0] = BreakStatement()
 # --- FIN APORTE VALERIA GAVELA ---
 
 
@@ -471,7 +646,7 @@ def generar_log_sintactico(
     directorio_logs: str = "logs",
 ) -> str:
 
-    fecha = datetime.now().strftime("%d%m%Y-%Hh%M")
+    fecha = datetime.now().strftime("%d-%m-%Y-%Hh%M")
     nombre_log = f"sintactico-{autor}-{fecha}.txt"
     os.makedirs(directorio_logs, exist_ok=True)
     ruta_log = os.path.join(directorio_logs, nombre_log)
