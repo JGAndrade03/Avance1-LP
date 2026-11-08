@@ -1,0 +1,9 @@
+INSTRUCCIONES RECONOCIDAS:
+Ninguna
+
+ERRORES DE ANÁLISIS:
+Error sintáctico en línea 4: token LOCAL ('local') inesperado.
+Error sintáctico en línea 5: token FUNCTION ('function') inesperado.
+Error sintáctico en línea 6: token RETURN ('return') inesperado.
+Error sintáctico en línea 9: token ID ('x') inesperado.
+Error sintáctico en línea 14: token ID ('matriz') inesperado.
