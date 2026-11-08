@@ -49,9 +49,47 @@ class VariableDeclaration:
 class Assignment:
     names: tuple[str, ...]
     values: tuple[Expression, ...]
+    
+    
+
+# --- JUAN GUALOTUÑA ---
+@dataclass(frozen=True)
+class ForLoop:
+    iterator: str
+    start: Expression
+    end: Expression
+    step: Expression | None
+    body: list[Statement]
+
+@dataclass(frozen=True)
+class DictionaryField:
+    key: str | Expression
+    value: Expression
+
+@dataclass(frozen=True)
+class Dictionary:
+    fields: tuple[DictionaryField, ...]
+
+@dataclass(frozen=True)
+class AnonymousFunction:
+    params: tuple[str, ...]
+    body: list[Statement]
+
+@dataclass(frozen=True)
+class PrintStatement:
+    arguments: tuple[Expression, ...]
+
+@dataclass(frozen=True)
+class ReadExpression:
+    pass
 
 
-Statement: TypeAlias = VariableDeclaration | Assignment
+#----------------------------------------------------
+
+
+Expression: TypeAlias = Literal | Variable | UnaryExpression | BinaryExpression | Dictionary | AnonymousFunction | ReadExpression
+
+Statement: TypeAlias = VariableDeclaration | Assignment | ForLoop | PrintStatement
 
 
 class ParseError(ValueError):
@@ -161,6 +199,66 @@ def p_expression_binary(p):
                   | expression MODULO expression
                   | expression POWER expression"""
     p[0] = BinaryExpression(p[2], p[1], p[3])
+    
+    
+#--- JUAN GUALOTUÑA -----
+
+# Bucle FOR:
+def p_statement_for(p):
+    """statement : FOR ID ASSIGN expression COMMA expression DO statements END_DELIM
+                 | FOR ID ASSIGN expression COMMA expression COMMA expression DO statements END_DELIM"""
+    if len(p) == 10:
+        p[0] = ForLoop(p[2], p[4], p[6], None, p[8])
+    else:
+        p[0] = ForLoop(p[2], p[4], p[6], p[8], p[9])
+
+# Diccionarios:
+def p_expression_dictionary(p):
+    """expression : LBRACE dictionary_fields RBRACE
+                  | LBRACE RBRACE"""
+    p[0] = Dictionary(tuple(p[2])) if len(p) == 4 else Dictionary(())
+
+def p_dictionary_fields_single(p):
+    "dictionary_fields : dictionary_field"
+    p[0] = [p[1]]
+
+def p_dictionary_fields_multiple(p):
+    "dictionary_fields : dictionary_fields COMMA dictionary_field"
+    p[0] = p[1] + [p[3]]
+
+def p_dictionary_field_id(p):
+    "dictionary_field : ID ASSIGN expression"
+    p[0] = DictionaryField(p[1], p[3])
+
+def p_dictionary_field_bracket(p):
+    "dictionary_field : LBRACKET expression RBRACKET ASSIGN expression"
+    p[0] = DictionaryField(p[2], p[5])
+
+# Funciones Anónimas:
+def p_expression_anonymous_function(p):
+    "expression : FUNCTION LPAREN optional_names RPAREN statements END_DELIM"
+    p[0] = AnonymousFunction(tuple(p[3]), p[5])
+
+def p_optional_names(p):
+    """optional_names : names
+                      | empty"""
+    p[0] = p[1] if p[1] is not None else []
+
+# Print y IO.Read:
+def p_statement_print(p):
+    "statement : PRINT LPAREN optional_expressions RPAREN"
+    p[0] = PrintStatement(tuple(p[3]))
+
+def p_optional_expressions(p):
+    """optional_expressions : expressions
+                            | empty"""
+    p[0] = p[1] if p[1] is not None else []
+
+def p_expression_io_read(p):
+    "expression : IO_READ LPAREN RPAREN"
+    p[0] = ReadExpression()
+    
+# ---------------------------------------------------------------------
 
 
 def p_empty(p):
