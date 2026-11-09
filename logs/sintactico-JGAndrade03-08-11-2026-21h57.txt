@@ -1,0 +1,16 @@
+INSTRUCCIONES RECONOCIDAS:
+ForLoop(iterator='i', start=Literal(value=1), end=Literal(value=10), step=None, body=(PrintStatement(arguments=(Variable(name='i'),)),))
+ForLoop(iterator='contador', start=Literal(value=10), end=Literal(value=0), step=UnaryExpression(operator='-', operand=Literal(value=1)), body=(PrintStatement(arguments=(Variable(name='contador'),)),))
+ForLoop(iterator='j', start=BinaryExpression(operator='+', left=Literal(value=1), right=Literal(value=1)), end=BinaryExpression(operator='*', left=Literal(value=5), right=Literal(value=2)), step=None, body=(Assignment(names=('x',), values=(Literal(value=0),)),))
+Assignment(names=('usuario',), values=(Dictionary(fields=(DictionaryField(key='nombre', value=Literal(value='"Juan"')), DictionaryField(key='edad', value=Literal(value=23)))),))
+Assignment(names=('puntajes',), values=(Dictionary(fields=(DictionaryField(key=Literal(value='"nivel_1"'), value=Literal(value=100)), DictionaryField(key=Literal(value='"nivel_2"'), value=Literal(value=250)))),))
+Assignment(names=('inventario',), values=(ArrayLiteral(elements=()),))
+VariableDeclaration(names=('saludar',), values=(AnonymousFunction(params=(), body=(PrintStatement(arguments=(Literal(value='"Hola"'),)),)),), local=True)
+Assignment(names=('multiplicar',), values=(AnonymousFunction(params=('a', 'b'), body=(Assignment(names=('resultado',), values=(BinaryExpression(operator='*', left=Variable(name='a'), right=Variable(name='b')),)),)),))
+Assignment(names=('procesar',), values=(AnonymousFunction(params=('x',), body=(Assignment(names=('x',), values=(BinaryExpression(operator='+', left=Variable(name='x'), right=Literal(value=1)),)), PrintStatement(arguments=(Variable(name='x'),)))),))
+PrintStatement(arguments=(Literal(value='"Ingresa tu edad:"'),))
+Assignment(names=('edad_usuario',), values=(ReadExpression(),))
+PrintStatement(arguments=(Literal(value='"Tu edad es"'), Variable(name='edad_usuario')))
+
+ERRORES DE ANÁLISIS:
+Ninguno

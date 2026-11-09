@@ -1,0 +1,12 @@
+INSTRUCCIONES RECONOCIDAS:
+Ninguna
+
+ERRORES DE ANÁLISIS:
+Error léxico en línea 17: carácter no reconocido '@'
+Error léxico en línea 21: carácter no reconocido '$'
+Error léxico en línea 30: carácter no reconocido '!'
+Error léxico en línea 30: carácter no reconocido '&'
+Error léxico en línea 37: carácter no reconocido '?'
+Error sintáctico en línea 17: token ID ('nivel') inesperado.
+Error sintáctico en línea 30: token ID ('estadisticas_base') inesperado.
+Error sintáctico en línea 39: token END_DELIM ('end') inesperado.
