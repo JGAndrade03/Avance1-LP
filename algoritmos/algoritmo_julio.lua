@@ -100,3 +100,30 @@ print("Ingresa tu edad:")
 edad_usuario = io.read()
 
 print("Tu edad es", edad_usuario)
+
+
+-- Ejemplos con errores
+
+
+for i = 1, 10 --falta la palabra reservada "do"
+    print(i) 
+end
+
+
+for contador = 10 do  --falta ";"
+    print(contador) 
+end
+
+
+usuario = { nombre = "Juan" edad = 23 }  --faltan "," que separan los elementos
+
+
+configuracion = { volumen = }  -- Expresión incompleta
+
+
+
+multiplicar = function(a, b)  --falta palabra reservada "end"
+    resultado = a * b
+
+
+    
