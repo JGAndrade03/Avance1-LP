@@ -1,0 +1,9 @@
+INSTRUCCIONES RECONOCIDAS:
+Ninguna
+
+ERRORES DE ANÁLISIS:
+Error sintáctico en línea 4: token LOCAL ('local') inesperado.
+Error sintáctico en línea 7: token PRINT ('print') inesperado.
+Error sintáctico en línea 10: token END_DELIM ('end') inesperado.
+Error sintáctico en línea 13: token PRINT ('print') inesperado.
+Error sintáctico en línea 16: token RPAREN (')') inesperado.

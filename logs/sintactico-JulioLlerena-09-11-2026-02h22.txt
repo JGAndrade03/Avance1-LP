@@ -1,0 +1,17 @@
+INSTRUCCIONES RECONOCIDAS:
+VariableDeclaration(names=('calificacion1',), values=(Literal(value=8),), local=True)
+VariableDeclaration(names=('calificacion2',), values=(Literal(value=9),), local=True)
+VariableDeclaration(names=('calificacion3',), values=(Literal(value=7),), local=True)
+VariableDeclaration(names=('total',), values=(Literal(value=0),), local=True)
+FunctionDeclaration(name='sumarCalificacion', parameters=('valor',), body=(ReturnStatement(values=(BinaryExpression(operator='+', left=Variable(name='total'), right=Variable(name='valor')),)),), local=False)
+Assignment(names=('total',), values=(FunctionCall(name='sumarCalificacion', arguments=(Variable(name='calificacion1'),)),))
+Assignment(names=('total',), values=(FunctionCall(name='sumarCalificacion', arguments=(Variable(name='calificacion2'),)),))
+Assignment(names=('total',), values=(FunctionCall(name='sumarCalificacion', arguments=(Variable(name='calificacion3'),)),))
+VariableDeclaration(names=('promedio',), values=(BinaryExpression(operator='/', left=Variable(name='total'), right=Literal(value=3)),), local=True)
+VariableDeclaration(names=('resultado',), values=(Literal(value='"Reprobado"'),), local=True)
+IfStatement(condition=BinaryExpression(operator='>=', left=Variable(name='promedio'), right=Literal(value=7)), then_body=(Assignment(names=('resultado',), values=(Literal(value='"Aprobado"'),)),), else_body=(Assignment(names=('resultado',), values=(Literal(value='"Reprobado"'),)),))
+PrintStatement(arguments=(Literal(value='"Promedio:"'), Variable(name='promedio')))
+PrintStatement(arguments=(Literal(value='"Resultado:"'), Variable(name='resultado')))
+
+ERRORES DE ANÁLISIS:
+Ninguno
