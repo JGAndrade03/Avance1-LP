@@ -65,6 +65,10 @@ OPERADORES_RELACIONALES = {"==", "~=", "<", "<=", ">", ">="}
 REGLAS = {
     "OP-ARIT": "Operadores aritméticos: los operandos de + - * / // % ^ y del menos unario deben ser numéricos.",
     "OP-CONCAT": "Concatenación (..): los operandos deben ser cadenas o números; booleanos, nil, funciones y tablas son incompatibles.",
+    # --- INICIO APORTE JUAN GUALOTUÑA ---
+    "CTX-RETURN": "Contexto de return: la sentencia 'return' debe estar ubicada únicamente dentro del cuerpo de una función.",
+    "CTX-BREAK": "Ruptura de bucle (break): la sentencia 'break' debe estar ubicada strictly dentro de una estructura iterativa (for, while, repeat).",
+    # --- FIN APORTE JUAN GUALOTUÑA ---
 }
 
 
@@ -87,9 +91,10 @@ def unir(a: str, b: str) -> str:
 
 
 class Ambito:
-    def __init__(self, padre: "Ambito | None" = None, es_funcion: bool = False):
+    def __init__(self, padre: "Ambito | None" = None, es_funcion: bool = False, es_bucle: bool = False):
         self.padre = padre
         self.es_funcion = es_funcion
+        self.es_bucle = es_bucle 
         self.variables: dict[str, str] = {}
 
 
@@ -107,13 +112,31 @@ class AnalizadorSemantico:
         self.errores.append(ErrorSemantico(linea, regla, mensaje))
 
     @contextmanager
-    def _ambito(self, es_funcion: bool = False):
-        nuevo = Ambito(self.actual, es_funcion)
+    def _ambito(self, es_funcion: bool = False, es_bucle: bool = False):
+        nuevo = Ambito(self.actual, es_funcion=es_funcion, es_bucle=es_bucle)
         self.actual = nuevo
         try:
             yield nuevo
         finally:
             self.actual = nuevo.padre
+            
+    # --- INICIO APORTE JUAN GUALOTUÑA ---
+    def _esta_en_funcion(self) -> bool:
+        ambito = self.actual
+        while ambito is not None:
+            if ambito.es_funcion:
+                return True
+            ambito = ambito.padre
+        return False
+
+    def _esta_en_bucle(self) -> bool:
+        ambito = self.actual
+        while ambito is not None:
+            if ambito.es_bucle:
+                return True
+            ambito = ambito.padre
+        return False
+    # --- FIN APORTE JUAN GUALOTUÑA ---
 
     def _tipo_variable(self, nombre: str) -> str:
         """Tipo conocido de una variable. Si se lee desde dentro de una función
@@ -199,11 +222,11 @@ class AnalizadorSemantico:
 
         elif isinstance(s, WhileLoop):
             self._tipo(s.condition)
-            with self._ambito():
+            with self._ambito(es_bucle=True): 
                 self._bloque(s.body)
 
         elif isinstance(s, RepeatLoop):
-            with self._ambito():  # la condición de 'until' ve las locales del cuerpo
+            with self._ambito(es_bucle=True):
                 self._bloque(s.body)
                 self._tipo(s.condition)
 
@@ -212,7 +235,7 @@ class AnalizadorSemantico:
             self._tipo(s.end)
             if s.step is not None:
                 self._tipo(s.step)
-            with self._ambito():
+            with self._ambito(es_bucle=True): 
                 self._declarar(s.iterator, NUMERO)
                 self._bloque(s.body)
 
@@ -224,6 +247,13 @@ class AnalizadorSemantico:
             self._cuerpo_funcion(s.parameters, s.body, es_metodo=":" in s.name)
 
         elif isinstance(s, ReturnStatement):
+            if not self._esta_en_funcion():
+                linea = getattr(s, "line", 1)
+                self._error(
+                    linea,
+                    "CTX-RETURN",
+                    "la instrucción 'return' solo es válida dentro del cuerpo de una función.",
+                )
             for v in s.values:
                 self._tipo(v)
 
@@ -235,6 +265,13 @@ class AnalizadorSemantico:
             self._tipo(s)
 
         elif isinstance(s, BreakStatement):
+            if not self._esta_en_bucle():
+                linea = getattr(s, "line", 1)
+                self._error(
+                    linea,
+                    "CTX-BREAK",
+                    "la instrucción 'break' solo se permite dentro de un bucle (for, while, repeat).",
+                )
             pass
 
     def _cuerpo_funcion(self, parametros, cuerpo, es_metodo: bool = False) -> None:
