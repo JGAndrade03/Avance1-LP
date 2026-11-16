@@ -1,0 +1,12 @@
+ARCHIVO ANALIZADO: algoritmos/algoritmo_semantico_valido_Juan.lua
+
+REGLAS SEMÁNTICAS APLICADAS:
+[ID-DECL] Identificadores: toda variable debe declararse antes de usarse; la lectura de una variable sin declaración previa produce un error.
+[ID-CONST] Constantes: una variable declarada con <const> no puede reasignarse después de inicializarse.
+[OP-ARIT] Operadores aritméticos: los operandos de + - * / // % ^ y del menos unario deben ser numéricos.
+[OP-CONCAT] Concatenación (..): los operandos deben ser cadenas o números; booleanos, nil, funciones y tablas son incompatibles.
+[CTX-RETURN] Contexto de return: la sentencia 'return' debe estar ubicada únicamente dentro del cuerpo de una función.
+[CTX-BREAK] Ruptura de bucle (break): la sentencia 'break' debe estar ubicada strictly dentro de una estructura iterativa (for, while, repeat).
+
+ERRORES SEMÁNTICOS:
+Ninguno

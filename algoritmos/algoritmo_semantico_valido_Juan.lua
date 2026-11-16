@@ -51,5 +51,8 @@ local function evaluarMatriz()
     return prom
 end
 
+-- end --
+
+
 local resultadoFinal = evaluarMatriz()
 print(resultadoFinal)
