@@ -33,7 +33,7 @@ reserved = {
 tokens_julio = [
     'PLUS', 'MINUS', 'MULTIPLY', 'DIVIDE', 'FLOOR_DIVIDE', 'MODULO',
     'POWER', 'EQ', 'NE', 'LT', 'LE', 'GT', 'GE', 'ASSIGN', 'CONCAT',
-    'LENGTH',
+    'LENGTH', 'VARARG'  
 ]
 
 t_PLUS = r'\+'
@@ -50,6 +50,7 @@ t_LT = r'<'
 t_GE = r'>='
 t_GT = r'>'
 t_ASSIGN = r'='
+t_VARARG = r'\.\.\.'
 t_CONCAT = r'\.\.'
 t_LENGTH = r'\#'
 

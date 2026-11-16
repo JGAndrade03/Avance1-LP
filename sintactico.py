@@ -69,6 +69,20 @@ class Assignment:
 
 # --- JUAN GUALOTUÑA ---
 
+@dataclass(frozen=True)
+class GenericForLoop:
+    variables: tuple[str, ...]
+    expressions: tuple[Expression, ...]
+    body: tuple[Statement, ...]
+
+@dataclass(frozen=True)
+class GotoStatement:
+    label: str
+
+@dataclass(frozen=True)
+class LabelStatement:
+    name: str
+
 
 @dataclass(frozen=True)
 class ForLoop:
@@ -207,6 +221,9 @@ Statement: TypeAlias = (
     | FunctionDeclaration
     | ReturnStatement
     | ForLoop
+    | GenericForLoop   
+    | GotoStatement     
+    | LabelStatement     
     | PrintStatement
     | WhileLoop
     | RepeatLoop
@@ -215,7 +232,6 @@ Statement: TypeAlias = (
     | FunctionCall
     | MethodCall
 )
-
 
 class ParseError(ValueError):
     """Error léxico o sintáctico producido al analizar el código fuente."""
@@ -250,9 +266,12 @@ def p_statements_empty(p):
 
 
 def p_statement_local_declaration(p):
-    "statement : LOCAL names optional_initializer"
-    p[0] = VariableDeclaration(tuple(p[2]), tuple(p[3]), local=True)
-
+    """statement : LOCAL names optional_initializer
+                 | LOCAL ID LT ID GT ASSIGN expressions"""
+    if len(p) == 4:
+        p[0] = VariableDeclaration(tuple(p[2]), tuple(p[3]), local=True)
+    else:
+        p[0] = VariableDeclaration((p[2],), tuple(p[7]), local=True)
 
 #--- JUAN GUALOTUÑA -----
 
@@ -264,6 +283,18 @@ def p_statement_for(p):
         p[0] = ForLoop(p[2], p[4], p[6], None, tuple(p[8]))
     else:
         p[0] = ForLoop(p[2], p[4], p[6], p[8], tuple(p[10]))
+
+def p_statement_generic_for(p):
+    "statement : FOR names IN expressions DO statements END_DELIM"
+    p[0] = GenericForLoop(tuple(p[2]), tuple(p[4]), tuple(p[6]))
+
+def p_statement_goto(p):
+    "statement : GOTO ID"
+    p[0] = GotoStatement(p[2])
+
+def p_statement_label(p):
+    "statement : COLON COLON ID COLON COLON"
+    p[0] = LabelStatement(p[3])
 
 
 def p_statement_if(p):
@@ -298,14 +329,14 @@ def p_optional_parameters(p):
 
 
 def p_parameters_single(p):
-    "parameters : ID"
+    """parameters : ID
+                  | VARARG"""
     p[0] = [p[1]]
 
-
 def p_parameters_multiple(p):
-    "parameters : parameters COMMA ID"
+    """parameters : parameters COMMA ID
+                  | parameters COMMA VARARG"""
     p[0] = p[1] + [p[3]]
-
 
 def p_statement_return(p):
     "statement : RETURN optional_return_values"
@@ -370,9 +401,9 @@ def p_dictionary_fields_single(p):
 
 
 def p_dictionary_fields_multiple(p):
-    "dictionary_fields : dictionary_fields COMMA dictionary_field"
+    """dictionary_fields : dictionary_fields COMMA dictionary_field
+                         | dictionary_fields SEMICOLON dictionary_field"""
     p[0] = p[1] + [p[3]]
-
 
 def p_dictionary_field_id(p):
     "dictionary_field : ID ASSIGN expression"
