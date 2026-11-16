@@ -32,8 +32,9 @@ reserved = {
 
 tokens_julio = [
     'PLUS', 'MINUS', 'MULTIPLY', 'DIVIDE', 'FLOOR_DIVIDE', 'MODULO',
-    'POWER', 'EQ', 'NE', 'LT', 'LE', 'GT', 'GE', 'ASSIGN', 'CONCAT',
-    'LENGTH', 'VARARG'  
+    'POWER', 'EQ', 'NE', 'LT', 'LE', 'GT', 'GE', 'ASSIGN', 'CONCAT','LENGTH', 'VARARG',
+    'CONST',
+
 ]
 
 t_PLUS = r'\+'
@@ -45,6 +46,7 @@ t_MODULO = r'%'
 t_POWER = r'\^'
 t_EQ = r'=='
 t_NE = r'~='
+t_CONST = r'<const>'
 t_LE = r'<='
 t_LT = r'<'
 t_GE = r'>='

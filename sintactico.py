@@ -20,6 +20,7 @@ class Literal:
 @dataclass(frozen=True)
 class Variable:
     name: str
+    line: int = field(default=0, compare=False, repr=False)
 
 
 @dataclass(frozen=True)
@@ -59,12 +60,15 @@ class VariableDeclaration:
     names: tuple[str, ...]
     values: tuple[Expression, ...]
     local: bool
+    const: bool = False
+    line: int = field(default=0, compare=False, repr=False)
 
 
 @dataclass(frozen=True)
 class Assignment:
     names: tuple[str, ...]
     values: tuple[Expression, ...]
+    line: int = field(default=0, compare=False, repr=False)
 
 
 # --- JUAN GUALOTUÑA ---
@@ -210,6 +214,7 @@ class TargetAssignment:
     """Asignación a campos o múltiple: p.edad = 3, a[1], b.x = 1, 2"""
     targets: tuple[Expression, ...]
     values: tuple[Expression, ...]
+    line: int = field(default=0, compare=False, repr=False)
 # --- FIN APORTE VALERIA GAVELA ---
 
 
@@ -266,12 +271,13 @@ def p_statements_empty(p):
 
 
 def p_statement_local_declaration(p):
-    """statement : LOCAL names optional_initializer
-                 | LOCAL ID LT ID GT ASSIGN expressions"""
-    if len(p) == 4:
-        p[0] = VariableDeclaration(tuple(p[2]), tuple(p[3]), local=True)
-    else:
-        p[0] = VariableDeclaration((p[2],), tuple(p[7]), local=True)
+    "statement : LOCAL names optional_initializer"
+    p[0] = VariableDeclaration(tuple(p[2]), tuple(p[3]), local=True, line=p.lineno(1))
+
+
+def p_statement_local_declaration_const(p):
+    "statement : LOCAL names CONST optional_initializer"
+    p[0] = VariableDeclaration(tuple(p[2]), tuple(p[4]), local=True, const=True, line=p.lineno(1))
 
 #--- JUAN GUALOTUÑA -----
 
@@ -528,7 +534,7 @@ def p_expression_length(p):
 # Variables y accesos: x, m[i], m[i][j] (matriz), p.nombre (campo)
 def p_var_name(p):
     "var : ID"
-    p[0] = Variable(p[1])
+    p[0] = Variable(p[1], p.lineno(1))
 
 
 def p_var_index(p):
@@ -562,12 +568,13 @@ def p_expression_prefixexp(p):
 def p_statement_assignment(p):
     "statement : varlist ASSIGN expressions"
     targets, values = p[1], tuple(p[3])
+    line = max((t.line for t in targets if isinstance(t, Variable)), default=0)
     if all(isinstance(t, Variable) for t in targets):
-        p[0] = Assignment(tuple(t.name for t in targets), values)
+        p[0] = Assignment(tuple(t.name for t in targets), values, line=line)
     elif len(targets) == 1 and isinstance(targets[0], IndexExpression):
         p[0] = IndexedAssignment(targets[0], values)
     else:
-        p[0] = TargetAssignment(tuple(targets), values)
+        p[0] = TargetAssignment(tuple(targets), values, line=line)
 
 
 # Llamadas a función: f(x), t.f(x), f(1)(2), obj:metodo(x)

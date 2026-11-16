@@ -63,6 +63,8 @@ OPERADORES_RELACIONALES = {"==", "~=", "<", "<=", ">", ">="}
 # Reglas semánticas del equipo (se muestran en el log).
 # Cada integrante agrega aquí el identificador y la descripción de sus reglas.
 REGLAS = {
+    "ID-DECL": "Identificadores: toda variable debe declararse antes de usarse; la lectura de una variable sin declaración previa produce un error.",
+    "ID-CONST": "Constantes: una variable declarada con <const> no puede reasignarse después de inicializarse.",
     "OP-ARIT": "Operadores aritméticos: los operandos de + - * / // % ^ y del menos unario deben ser numéricos.",
     "OP-CONCAT": "Concatenación (..): los operandos deben ser cadenas o números; booleanos, nil, funciones y tablas son incompatibles.",
     # --- INICIO APORTE JUAN GUALOTUÑA ---
@@ -96,6 +98,7 @@ class Ambito:
         self.es_funcion = es_funcion
         self.es_bucle = es_bucle 
         self.variables: dict[str, str] = {}
+        self.constantes: set[str] = set()
 
 
 # ---------------------------------------------------------------------------
@@ -150,13 +153,36 @@ class AnalizadorSemantico:
             ambito = ambito.padre
         return DESCONOCIDO  # global no declarada (otra regla puede reportarla)
 
-    def _declarar(self, nombre: str, tipo: str) -> None:
+    def _declarar(self, nombre: str, tipo: str, constante: bool = False) -> None:
         self.actual.variables[nombre] = tipo
+        if constante:
+            self.actual.constantes.add(nombre)
 
-    def _asignar(self, nombre: str, tipo: str) -> None:
+    def _es_constante(self, nombre: str) -> bool:
+        ambito = self.actual
+        while ambito is not None:
+            if nombre in ambito.constantes:
+                return True
+            ambito = ambito.padre
+        return False
+
+    def _regla_declaracion_previa(self, linea: int, nombre: str) -> None:
+        ambito = self.actual
+        while ambito is not None:
+            if nombre in ambito.variables:
+                return
+            ambito = ambito.padre
+        self._error(linea, "ID-DECL", f"el identificador '{nombre}' se usa antes de declararse.")
+
+    def _regla_constante(self, linea: int, nombre: str) -> None:
+        if self._es_constante(nombre):
+            self._error(linea, "ID-CONST", f"la constante '{nombre}' no puede reasignarse.")
+
+    def _asignar(self, nombre: str, tipo: str, linea: int = 0) -> None:
         """Asignación. En el mismo bloque donde se declaró se sobrescribe el
         tipo; desde un bloque más interno (if, while, función...) se une con el
         anterior porque no se sabe si ese camino se ejecuta."""
+        self._regla_constante(linea, nombre)
         ambito, cruzo_funcion = self.actual, False
         while ambito is not None:
             if nombre in ambito.variables:
@@ -191,14 +217,14 @@ class AnalizadorSemantico:
             for i, nombre in enumerate(s.names):
                 tipo = self._tipo_posicional(tipos, s.values, i)
                 if s.local:
-                    self._declarar(nombre, tipo)
+                    self._declarar(nombre, tipo, constante=s.const)
                 else:
-                    self._asignar(nombre, tipo)
+                    self._asignar(nombre, tipo, getattr(s, "line", 0))
 
         elif isinstance(s, Assignment):
             tipos = [self._tipo(v) for v in s.values]
             for i, nombre in enumerate(s.names):
-                self._asignar(nombre, self._tipo_posicional(tipos, s.values, i))
+                self._asignar(nombre, self._tipo_posicional(tipos, s.values, i), getattr(s, "line", 0))
 
         elif isinstance(s, IndexedAssignment):
             for v in s.values:
@@ -209,7 +235,7 @@ class AnalizadorSemantico:
             tipos = [self._tipo(v) for v in s.values]
             for i, destino in enumerate(s.targets):
                 if isinstance(destino, Variable):
-                    self._asignar(destino.name, self._tipo_posicional(tipos, s.values, i))
+                    self._asignar(destino.name, self._tipo_posicional(tipos, s.values, i), getattr(s, "line", 0))
                 else:
                     self._tipo(destino)
 
@@ -302,6 +328,7 @@ class AnalizadorSemantico:
             return CADENA
 
         if isinstance(e, Variable):
+            self._regla_declaracion_previa(getattr(e, "line", 0), e.name)
             return self._tipo_variable(e.name)
 
         if isinstance(e, ReadExpression):
