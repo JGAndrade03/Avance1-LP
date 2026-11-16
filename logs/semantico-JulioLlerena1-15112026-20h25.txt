@@ -1,0 +1,8 @@
+ARCHIVO ANALIZADO: algoritmos/algoritmo_semantico_julio.lua
+
+REGLAS SEMÁNTICAS APLICADAS:
+[OP-ARIT] Operadores aritméticos: los operandos de + - * / // % ^ y del menos unario deben ser numéricos.
+[OP-CONCAT] Concatenación (..): los operandos deben ser cadenas o números; booleanos, nil, funciones y tablas son incompatibles.
+
+ERRORES LÉXICOS/SINTÁCTICOS (análisis semántico omitido):
+Error sintáctico en línea 7: token LT ('<') inesperado.
