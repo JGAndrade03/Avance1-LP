@@ -1,0 +1,30 @@
+ARCHIVO ANALIZADO: algoritmos/algoritmo_semantico_erroresvaleria.lua
+
+REGLAS SEMÁNTICAS APLICADAS:
+[OP-ARIT] Operadores aritméticos: los operandos de + - * / // % ^ y del menos unario deben ser numéricos.
+[OP-CONCAT] Concatenación (..): los operandos deben ser cadenas o números; booleanos, nil, funciones y tablas son incompatibles.
+
+ERRORES SEMÁNTICOS:
+Error semántico en línea 14 [OP-ARIT]: operación aritmética '*' incompatible: el operando derecho ('activo') es de tipo booleano; se esperaban operandos numéricos.
+Error semántico en línea 15 [OP-ARIT]: operación aritmética '+' incompatible: el operando izquierdo ('impuestos') es de tipo tabla; se esperaban operandos numéricos.
+Error semántico en línea 16 [OP-ARIT]: operación aritmética '-' incompatible: el operando derecho ('descuento') es de tipo nil; se esperaban operandos numéricos.
+Error semántico en línea 17 [OP-ARIT]: operación aritmética '-' incompatible: el operando izquierdo ('titulo') es de tipo cadena; se esperaban operandos numéricos.
+Error semántico en línea 18 [OP-CONCAT]: no se puede concatenar una tabla directamente con '..': el operando derecho ('impuestos') es una tabla; use table.concat().
+Error semántico en línea 19 [OP-CONCAT]: concatenación '..' incompatible: el operando derecho ('activo') es de tipo booleano; se esperaban cadenas o números.
+Error semántico en línea 25 [OP-ARIT]: operación aritmética '+' incompatible: el operando izquierdo ('pendiente') es de tipo booleano; se esperaban operandos numéricos.
+Error semántico en línea 31 [OP-CONCAT]: concatenación '..' incompatible: el operando derecho ('sin_valor') es de tipo nil; se esperaban cadenas o números.
+Error semántico en línea 37 [OP-ARIT]: operación aritmética '*' incompatible: el operando derecho ('etiquetas') es de tipo tabla; se esperaban operandos numéricos.
+Error semántico en línea 38 [OP-ARIT]: operación aritmética '-' incompatible: el operando ('activo') es de tipo booleano; se esperaban operandos numéricos.
+Error semántico en línea 44 [OP-CONCAT]: concatenación '..' incompatible: el operando derecho (true) es de tipo booleano; se esperaban cadenas o números.
+Error semántico en línea 45 [OP-CONCAT]: no se puede concatenar una tabla directamente con '..': el operando derecho es una tabla; use table.concat().
+Error semántico en línea 50 [OP-ARIT]: operación aritmética '-' incompatible: el operando derecho ('extra') es de tipo cadena; se esperaban operandos numéricos.
+Error semántico en línea 56 [OP-ARIT]: operación aritmética '+' incompatible: el operando izquierdo ('texto') es de tipo cadena; se esperaban operandos numéricos.
+Error semántico en línea 59 [OP-CONCAT]: no se puede concatenar una tabla directamente con '..': el operando derecho ('copia') es una tabla; use table.concat().
+Error semántico en línea 61 [OP-ARIT]: operación aritmética '*' incompatible: el operando izquierdo ('verdadero') es de tipo booleano; se esperaban operandos numéricos.
+Error semántico en línea 62 [OP-CONCAT]: concatenación '..' incompatible: el operando izquierdo ('verdadero') es de tipo booleano; se esperaban cadenas o números.
+Error semántico en línea 68 [OP-ARIT]: operación aritmética '+' incompatible: el operando izquierdo ('calcular') es de tipo función; se esperaban operandos numéricos.
+Error semántico en línea 69 [OP-CONCAT]: concatenación '..' incompatible: el operando derecho ('calcular') es de tipo función; se esperaban cadenas o números.
+Error semántico en línea 72 [OP-ARIT]: operación aritmética '+' incompatible: el operando izquierdo (true) es de tipo booleano y el operando derecho (false) es de tipo booleano; se esperaban operandos numéricos.
+Error semántico en línea 72 [OP-ARIT]: operación aritmética '*' incompatible: el operando derecho es de tipo tabla; se esperaban operandos numéricos.
+Error semántico en línea 73 [OP-CONCAT]: concatenación '..' incompatible: el operando izquierdo (nil) es de tipo nil; se esperaban cadenas o números.
+Error semántico en línea 73 [OP-CONCAT]: concatenación '..' incompatible: el operando derecho ('activo') es de tipo booleano; se esperaban cadenas o números.
