@@ -1,0 +1,8 @@
+ARCHIVO ANALIZADO: algoritmos/algoritmo_semantico_valeria.lua
+
+REGLAS SEMÁNTICAS APLICADAS:
+[OP-ARIT] Operadores aritméticos: los operandos de + - * / // % ^ y del menos unario deben ser numéricos.
+[OP-CONCAT] Concatenación (..): los operandos deben ser cadenas o números; booleanos, nil, funciones y tablas son incompatibles.
+
+ERRORES SEMÁNTICOS:
+Ninguno

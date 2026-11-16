@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import argparse
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 import os
 import sys
@@ -26,6 +26,7 @@ class Variable:
 class UnaryExpression:
     operator: str
     operand: Expression
+    line: int = field(default=0, compare=False, repr=False)  # Avance 3: línea para errores semánticos
 
 
 @dataclass(frozen=True)
@@ -33,6 +34,7 @@ class BinaryExpression:
     operator: str
     left: Expression
     right: Expression
+    line: int = field(default=0, compare=False, repr=False)  # Avance 3: línea para errores semánticos
 
 
 @dataclass(frozen=True)
@@ -444,7 +446,7 @@ def p_expression_grouped(p):
 
 def p_expression_unary_minus(p):
     "expression : MINUS expression %prec UMINUS"
-    p[0] = UnaryExpression("-", p[2])
+    p[0] = UnaryExpression("-", p[2], p.lineno(1))
 
 
 def p_expression_binary(p):
@@ -455,7 +457,7 @@ def p_expression_binary(p):
                   | expression FLOOR_DIVIDE expression
                   | expression MODULO expression
                   | expression POWER expression"""
-    p[0] = BinaryExpression(p[2], p[1], p[3])
+    p[0] = BinaryExpression(p[2], p[1], p[3], p.lineno(2))
 
 
 # --- INICIO APORTE VALERIA GAVELA ---
@@ -467,29 +469,29 @@ def p_expression_relational(p):
                   | expression LE expression
                   | expression GT expression
                   | expression GE expression"""
-    p[0] = BinaryExpression(p[2], p[1], p[3])
+    p[0] = BinaryExpression(p[2], p[1], p[3], p.lineno(2))
 
 
 def p_expression_logical(p):
     """expression : expression AND expression
                   | expression OR expression"""
-    p[0] = BinaryExpression(p[2], p[1], p[3])
+    p[0] = BinaryExpression(p[2], p[1], p[3], p.lineno(2))
 
 
 def p_expression_not(p):
     "expression : NOT expression"
-    p[0] = UnaryExpression("not", p[2])
+    p[0] = UnaryExpression("not", p[2], p.lineno(1))
 
 
 # Operadores: concatenación (..) y longitud (#), p. ej. #matriz
 def p_expression_concat(p):
     "expression : expression CONCAT expression"
-    p[0] = BinaryExpression(p[2], p[1], p[3])
+    p[0] = BinaryExpression(p[2], p[1], p[3], p.lineno(2))
 
 
 def p_expression_length(p):
     "expression : LENGTH expression %prec UMINUS"
-    p[0] = UnaryExpression("#", p[2])
+    p[0] = UnaryExpression("#", p[2], p.lineno(1))
 
 
 # Variables y accesos: x, m[i], m[i][j] (matriz), p.nombre (campo)
