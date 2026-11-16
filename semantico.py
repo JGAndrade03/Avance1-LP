@@ -25,11 +25,14 @@ from sintactico import (
     Dictionary,
     FieldAccess,
     ForLoop,
+    GenericForLoop,  
     FunctionCall,
     FunctionDeclaration,
+    GotoStatement,    
     IfStatement,
     IndexedAssignment,
     IndexExpression,
+    LabelStatement,   
     Literal,
     Matrix,
     MethodCall,
@@ -264,6 +267,17 @@ class AnalizadorSemantico:
             with self._ambito(es_bucle=True): 
                 self._declarar(s.iterator, NUMERO)
                 self._bloque(s.body)
+                
+        elif isinstance(s, GenericForLoop):
+            for e in s.expressions:
+                self._tipo(e)
+            with self._ambito(es_bucle=True):
+                for var in s.variables:
+                    self._declarar(var, DESCONOCIDO)
+                self._bloque(s.body)
+
+        elif isinstance(s, (GotoStatement, LabelStatement)):
+            pass
 
         elif isinstance(s, FunctionDeclaration):
             if s.local:
