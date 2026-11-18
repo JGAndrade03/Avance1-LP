@@ -71,10 +71,31 @@ def t_COMMENT_BLOCK(t):
     t.lexer.lineno += t.value.count('\n')   # mantener el conteo de líneas
     pass # Se ignora, no devuelve token
 
+# Comentario de bloque sin cerrar: llega hasta el final del archivo
+def t_COMMENT_BLOCK_SIN_CERRAR(t):
+    r'--\[\[[\s\S]*'
+    t.lexer.errores.append(f"Error léxico en línea {t.lexer.lineno}: comentario de bloque sin cerrar")
+    t.lexer.lineno += t.value.count('\n')
+    # no devuelve token
+
 # Regla para comentarios de una sola línea
 def t_COMMENT_LINE(t):
     r'--.*'
     pass # Se ignora, no devuelve token
+
+# Número malformado: empieza como número pero lo siguen letras o es incompleto
+# (3abc, 0xZZ, 1e, 0x). Si el número es válido, esta regla no coincide.
+_NUM_VALIDO = (r'(?:0[xX][0-9a-fA-F]+'
+               r'|(?:\d+\.\d*|\.\d+)(?:[eE][+-]?\d+)?'
+               r'|\d+[eE][+-]?\d+'
+               r'|\d+(?!\.))')
+_NUM_CANDIDATO = (r'(?:0[xX][0-9a-fA-F]*'
+                  r'|(?:\d+\.\d*|\.\d+|\d+)(?:[eE][+-]?\d*)?)[A-Za-z0-9_]*')
+
+@lex.TOKEN(r'(?!' + _NUM_VALIDO + r'(?![A-Za-z0-9_]))' + _NUM_CANDIDATO)
+def t_NUMERO_MALFORMADO(t):
+    t.lexer.errores.append(f"Error léxico en línea {t.lexer.lineno}: número malformado '{t.value}'")
+    # no devuelve token
 
 # Tipos de datos primitivos (Valeria)
 def t_HEXADECIMAL(t):
@@ -95,7 +116,15 @@ def t_ENTERO(t):
 def t_CADENA(t):
     r'"(?:[^"\\\n]|\\.)*"|\'(?:[^\'\\\n]|\\.)*\'|\[\[[\s\S]*?\]\]'
     t.value = str(t.value)
+    t.lexer.lineno += t.value.count('\n')   # cadenas [[...]] de varias líneas
     return t
+
+# Cadena sin cerrar: comilla sin pareja en la línea, o [[ sin ]] hasta el final
+def t_CADENA_SIN_CERRAR(t):
+    r'"(?:[^"\\\n]|\\.)*|\'(?:[^\'\\\n]|\\.)*|\[\[[\s\S]*'
+    t.lexer.errores.append(f"Error léxico en línea {t.lexer.lineno}: cadena sin cerrar")
+    t.lexer.lineno += t.value.count('\n')
+    # no devuelve token
 
 #------------------------------------------------------------------
 
